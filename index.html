@@ -1,45 +1,88 @@
 <!DOCTYPE html>
 <html>
-
 <head>
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Damage Claim</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Damage Claim</title>
 </head>
 
-<body style="font-family:sans-serif;padding:20px">
+<body style="font-family:sans-serif;padding:20px;max-width:420px;margin:auto">
 
-    <h3>Raise Logistics Damage Claim</h3>
+<h3>Raise Logistics Damage Claim</h3>
 
-    <input id="shipmentId" placeholder="Enter Shipment ID" style="width:100%;padding:10px" />
+<label><b>Select Shipment ID</b></label>
+<br>
+<select id="shipmentId" style="width:100%;padding:10px">
+  <option value="">-- Select Shipment --</option>
+  <option value="MEC12345">MEC12345</option>
+  <option value="MEC1001">MEC1001</option>
+  <option value="MEC1002">MEC1002</option>
+  <option value="MEC1003">MEC1003</option>
+</select>
 
-    <br><br>
+<br><br>
 
-    <input type="file" accept="image/*" capture="camera" />
+<label><b>Capture Package Image</b></label>
+<br>
+<input type="file" accept="image/*" capture="camera" />
 
-    <br><br>
+<br><br>
 
-    <button onclick="submitClaim()" style="padding:12px;width:100%">
-        Submit Claim
-    </button>
+<button onclick="saveData()" style="padding:12px;width:100%">
+Save
+</button>
 
-    <script>
-        function submitClaim() {
-            const shipmentId = document.getElementById("shipmentId").value;
+<br><br>
 
-            fetch("https://yoxowok.app.n8n.cloud/webhook-test/create-claim", {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({
-                    shipmentId: shipmentId,
-                    isDamaged: true
-                })
-            })
-                .then(res => res.json())
-                .then(data => alert(JSON.stringify(data, null, 2)))
-                .catch(err => alert("Error"));
-        }
-    </script>
+<label><b>Payload Preview</b></label>
+<pre id="preview" style="background:#f4f4f4;padding:10px;border-radius:4px"></pre>
+
+<br>
+
+<button onclick="submitClaim()" style="padding:12px;width:100%">
+Submit Claim
+</button>
+
+<script>
+let payload = null;
+
+function saveData() {
+  const shipmentId = document.getElementById("shipmentId").value;
+
+  if (!shipmentId) {
+    alert("Please select a shipment ID");
+    return;
+  }
+
+  // Hardcoded damage = true (as agreed)
+  payload = {
+    shipmentId: shipmentId,
+    isDamaged: true
+  };
+
+  document.getElementById("preview").textContent =
+    JSON.stringify(payload, null, 2);
+}
+
+function submitClaim() {
+  if (!payload) {
+    alert("Please click Save before submitting");
+    return;
+  }
+
+  fetch("https://yoxowok.app.n8n.cloud/webhook-test/create-claim", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(payload)
+  })
+  .then(res => res.json())
+  .then(data => {
+    alert("Response:\n" + JSON.stringify(data, null, 2));
+  })
+  .catch(err => {
+    alert("Error submitting claim");
+  });
+}
+</script>
 
 </body>
-
 </html>
