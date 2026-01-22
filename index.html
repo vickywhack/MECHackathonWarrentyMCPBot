@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Damage Claim</title>
+</head>
+
+<body style="font-family:sans-serif;padding:20px">
+
+    <h3>Raise Logistics Damage Claim</h3>
+
+    <input id="shipmentId" placeholder="Enter Shipment ID" style="width:100%;padding:10px" />
+
+    <br><br>
+
+    <input type="file" accept="image/*" capture="camera" />
+
+    <br><br>
+
+    <button onclick="submitClaim()" style="padding:12px;width:100%">
+        Submit Claim
+    </button>
+
+    <script>
+        function submitClaim() {
+            const shipmentId = document.getElementById("shipmentId").value;
+
+            fetch("https://yoxowok.app.n8n.cloud/webhook-test/create-claim", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({
+                    shipmentId: shipmentId,
+                    isDamaged: true
+                })
+            })
+                .then(res => res.json())
+                .then(data => alert(JSON.stringify(data, null, 2)))
+                .catch(err => alert("Error"));
+        }
+    </script>
+
+</body>
+
+</html>
