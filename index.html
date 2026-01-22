@@ -1,88 +1,203 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
+
 <head>
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Damage Claim</title>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>MEC | Logistics Warranty Claim</title>
+
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial;
+            background: #f2f6f9;
+            color: #1a1a1a;
+        }
+
+        .container {
+            max-width: 420px;
+            margin: auto;
+            padding: 20px;
+        }
+
+        .card {
+            background: #ffffff;
+            border-radius: 12px;
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
+            padding: 20px;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .header h2 {
+            margin: 0;
+            color: #003b5c;
+        }
+
+        .header p {
+            font-size: 14px;
+            color: #666;
+            margin-top: 6px;
+        }
+
+        label {
+            font-size: 14px;
+            font-weight: 600;
+            display: block;
+            margin-bottom: 6px;
+        }
+
+        select,
+        input[type="file"] {
+            width: 100%;
+            padding: 12px;
+            border-radius: 8px;
+            border: 1px solid #ccc;
+            font-size: 15px;
+        }
+
+        .section {
+            margin-bottom: 18px;
+        }
+
+        .btn {
+            width: 100%;
+            padding: 14px;
+            border-radius: 10px;
+            font-size: 15px;
+            font-weight: 600;
+            border: none;
+            cursor: pointer;
+        }
+
+        .btn-save {
+            background: #e6f1f7;
+            color: #003b5c;
+        }
+
+        .btn-submit {
+            background: #0077b6;
+            color: #fff;
+        }
+
+        .btn-submit:disabled {
+            background: #9bbfd6;
+        }
+
+        .preview {
+            background: #f7f9fb;
+            border: 1px dashed #cbd5e1;
+            border-radius: 8px;
+            padding: 12px;
+            font-size: 13px;
+            color: #333;
+            white-space: pre-wrap;
+        }
+
+        .footer {
+            text-align: center;
+            font-size: 12px;
+            color: #999;
+            margin-top: 14px;
+        }
+    </style>
 </head>
 
-<body style="font-family:sans-serif;padding:20px;max-width:420px;margin:auto">
+<body>
+    <div class="container">
+        <div class="card">
 
-<h3>Raise Logistics Damage Claim</h3>
+            <div class="header">
+                <h2>MEC Logistics Warranty</h2>
+                <p>Fast damage claims. No paperwork.</p>
+            </div>
 
-<label><b>Select Shipment ID</b></label>
-<br>
-<select id="shipmentId" style="width:100%;padding:10px">
-  <option value="">-- Select Shipment --</option>
-  <option value="MEC12345">MEC12345</option>
-  <option value="MEC1001">MEC1001</option>
-  <option value="MEC1002">MEC1002</option>
-  <option value="MEC1003">MEC1003</option>
-</select>
+            <div class="section">
+                <label>Select Shipment</label>
+                <select id="shipmentId">
+                    <option value="">— Choose Shipment ID —</option>
+                    <option value="MEC12345">MEC12345</option>
+                    <option value="MEC1001">MEC1001</option>
+                    <option value="MEC1002">MEC1002</option>
+                    <option value="MEC1003">MEC1003</option>
+                </select>
+            </div>
 
-<br><br>
+            <div class="section">
+                <label>Capture Damage Proof</label>
+                <input type="file" accept="image/*" capture="camera" />
+            </div>
 
-<label><b>Capture Package Image</b></label>
-<br>
-<input type="file" accept="image/*" capture="camera" />
+            <div class="section">
+                <button class="btn btn-save" onclick="saveData()">Save & Review</button>
+            </div>
 
-<br><br>
+            <div class="section">
+                <label>Claim Payload</label>
+                <div id="preview" class="preview">
+                    No data saved yet.
+                </div>
+            </div>
 
-<button onclick="saveData()" style="padding:12px;width:100%">
-Save
-</button>
+            <div class="section">
+                <button class="btn btn-submit" id="submitBtn" onclick="submitClaim()" disabled>
+                    Submit Claim
+                </button>
+            </div>
 
-<br><br>
+            <div class="footer">
+                © Maersk E-commerce · Demo Prototype
+            </div>
 
-<label><b>Payload Preview</b></label>
-<pre id="preview" style="background:#f4f4f4;padding:10px;border-radius:4px"></pre>
+        </div>
+    </div>
 
-<br>
+    <script>
+        let payload = null;
 
-<button onclick="submitClaim()" style="padding:12px;width:100%">
-Submit Claim
-</button>
+        function saveData() {
+            const shipmentId = document.getElementById("shipmentId").value;
 
-<script>
-let payload = null;
+            if (!shipmentId) {
+                alert("Please select a shipment ID");
+                return;
+            }
 
-function saveData() {
-  const shipmentId = document.getElementById("shipmentId").value;
+            payload = {
+                shipmentId: shipmentId,
+                isDamaged: true
+            };
 
-  if (!shipmentId) {
-    alert("Please select a shipment ID");
-    return;
-  }
+            document.getElementById("preview").textContent =
+                JSON.stringify(payload, null, 2);
 
-  // Hardcoded damage = true (as agreed)
-  payload = {
-    shipmentId: shipmentId,
-    isDamaged: true
-  };
+            document.getElementById("submitBtn").disabled = false;
+        }
 
-  document.getElementById("preview").textContent =
-    JSON.stringify(payload, null, 2);
-}
+        function submitClaim() {
+            if (!payload) {
+                alert("Please save data before submitting");
+                return;
+            }
 
-function submitClaim() {
-  if (!payload) {
-    alert("Please click Save before submitting");
-    return;
-  }
-
-  fetch("https://yoxowok.app.n8n.cloud/webhook-test/create-claim", {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(payload)
-  })
-  .then(res => res.json())
-  .then(data => {
-    alert("Response:\n" + JSON.stringify(data, null, 2));
-  })
-  .catch(err => {
-    alert("Error submitting claim");
-  });
-}
-</script>
-
+            fetch("https://yoxowok.app.n8n.cloud/webhook-test/create-claim", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify(payload)
+            })
+                .then(res => res.json())
+                .then(data => {
+                    alert("Claim Submitted Successfully\n\n" + JSON.stringify(data, null, 2));
+                })
+                .catch(() => {
+                    alert("Submission failed");
+                });
+        }
+    </script>
 </body>
+
 </html>
