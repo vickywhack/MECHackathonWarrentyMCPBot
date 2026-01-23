@@ -104,6 +104,23 @@
             color: #999;
             margin-top: 14px;
         }
+
+        /* Loading */
+        .loader {
+            width: 36px;
+            height: 36px;
+            border: 4px solid #e5e7eb;
+            border-top: 4px solid #0077b6;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 10px auto;
+        }
+
+        @keyframes spin {
+            to {
+                transform: rotate(360deg);
+            }
+        }
     </style>
 </head>
 
@@ -132,8 +149,18 @@
                 <input type="file" accept="image/*" capture="camera" />
             </div>
 
+            <!-- Loading section (ADDED) -->
+            <div class="section" id="loadingSection" style="display:none;">
+                <div class="loader"></div>
+                <p style="text-align:center; font-size:14px; color:#555;">
+                    Identifying package condition…
+                </p>
+            </div>
+
             <div class="section">
-                <button class="btn btn-save" onclick="saveData()">Save & Review</button>
+                <button class="btn btn-save" id="saveBtn" onclick="saveDataWithLoading()">
+                    Save & Review
+                </button>
             </div>
 
             <div class="section">
@@ -159,13 +186,26 @@
     <script>
         let payload = null;
 
-        function saveData() {
+        function saveDataWithLoading() {
             const shipmentId = document.getElementById("shipmentId").value;
 
             if (!shipmentId) {
                 alert("Please select a shipment ID");
                 return;
             }
+
+            document.getElementById("loadingSection").style.display = "block";
+            document.getElementById("saveBtn").disabled = true;
+
+            setTimeout(() => {
+                saveData();
+                document.getElementById("loadingSection").style.display = "none";
+                document.getElementById("saveBtn").disabled = false;
+            }, 1500);
+        }
+
+        function saveData() {
+            const shipmentId = document.getElementById("shipmentId").value;
 
             payload = {
                 shipmentId: shipmentId,
@@ -184,7 +224,7 @@
                 return;
             }
 
-            fetch("https://yoxowok.app.n8n.cloud/webhook-test/create-claim", {
+            fetch("https://yoxowok.app.n8n.cloud/webhook/create-claim", {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify(payload)
